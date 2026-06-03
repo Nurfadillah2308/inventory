@@ -1,12 +1,14 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreItemRequest;
 use App\Http\Requests\UpdateItemRequest;
 use App\Services\ItemService;
+use App\Http\Controllers\Api\BaseController;
 use Exception;
 
-class ItemController extends Controller {
+class ItemController extends BaseController {
     protected ItemService $svc;
 
     public function __construct(ItemService $svc) {
