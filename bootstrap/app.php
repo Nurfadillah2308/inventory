@@ -3,7 +3,6 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,17 +12,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        // Mendaftarkan alias 'role' agar bisa dipakai di routes/api.php
+        $middleware->alias([
+            'role' => \App\Http\Middleware\RoleMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        // Mengubah format semua error API menjadi JSON sesuai standar modul
-        $exceptions->render(function (\Throwable $e, Request $request) {
-            if ($request->is('api/*')) {
-                return response()->json([
-                    'status' => 'error',
-                    'data' => null,
-                    'message' => $e->getMessage()
-                ], method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500);
-            }
-        });
+        //
     })->create();
