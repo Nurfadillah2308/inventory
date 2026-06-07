@@ -2,65 +2,56 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\BaseController;
+use App\Models\Item;
 use App\Http\Requests\StoreItemRequest;
 use App\Http\Requests\UpdateItemRequest;
-use App\Services\ItemService;
-use App\Http\Controllers\Api\BaseController;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
 
-class ItemController extends BaseController {
-    protected ItemService $svc;
-
-    public function __construct(ItemService $svc) {
-        $this->svc = $svc;
+class ItemController extends BaseController
+{
+    public function index()
+    {
+        $items = Item::with('category')->get();
+        return $this->success($items, 'Items retrieved successfully.');
     }
 
-    public function index() {
-        return response()->json([
-            'status' => 'success', 
-            'data' => $this->svc->all(), 
-            'message' => 'Berhasil menarik semua data Item'
-        ]);
+    public function store(StoreItemRequest $request)
+    {
+        $item = Item::create($request->validated());
+        return $this->success($item, 'Item created successfully.', 201);
     }
 
-    public function store(StoreItemRequest $req) {
-        return response()->json([
-            'status' => 'success', 
-            'data' => $this->svc->create($req->validated()), 
-            'message' => 'Item berhasil dibuat'
-        ], 201);
-    }
-
-    public function show($id) {
+    public function show($id)
+    {
         try {
-            return response()->json([
-                'status' => 'success', 
-                'data' => $this->svc->find($id), 
-                'message' => 'Berhasil menarik satu data Item'
-            ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => 'error', 
-                'data' => null, 
-                'message' => $e->getMessage()
-            ], 404);
+            $item = Item::with('category')->findOrFail($id);
+            return $this->success($item, 'Item found successfully.');
+        } catch (ModelNotFoundException $e) {
+            return $this->error('Item not found.', 404);
         }
     }
 
-    public function update(UpdateItemRequest $req, $id) {
-        return response()->json([
-            'status' => 'success', 
-            'data' => $this->svc->update($id, $req->validated()), 
-            'message' => 'Item berhasil diperbarui'
-        ]);
+    public function update(UpdateItemRequest $request, $id)
+    {
+        try {
+            $item = Item::findOrFail($id);
+            $item->update($request->validated());
+            return $this->success($item, 'Item updated successfully.');
+        } catch (ModelNotFoundException $e) {
+            return $this->error('Item not found.', 404);
+        }
     }
 
-    public function destroy($id) {
-        $this->svc->delete($id);
-        return response()->json([
-            'status' => 'success', 
-            'data' => null, 
-            'message' => 'Item berhasil dihapus'
-        ], 200);
+    public function destroy($id)
+    {
+        try {
+            $item = Item::findOrFail($id);
+            $item->delete();
+            return $this->success(null, 'Item deleted successfully.');
+        } catch (ModelNotFoundException $e) {
+            return $this->error('Item not found.', 404);
+        }
     }
 }
