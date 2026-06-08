@@ -6,40 +6,27 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreItemRequest extends FormRequest
 {
-    public function authorize()
+    public function authorize(): bool
     {
-        return true; // Wajib diubah ke true agar request diizinkan
-    }
-    protected function prepareForValidation() {
-        $input = $this->all();
-
-        // Menyisir kiriman data dan melakukan trim serta strip_tags jika tipe data string
-        array_walk($input, function (&$val) {
-            if (is_string($val)) {
-                $val = trim(strip_tags($val));
-            }
-        });
-
-        $this->merge($input); // Memasukkan kembali data yang sudah bersih ke request
+        return true;
     }
 
-    public function rules()
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'name' => strip_tags(trim($this->name)),
+            'description' => $this->description ? strip_tags(trim($this->description)) : null,
+        ]);
+    }
+
+    public function rules(): array
     {
         return [
             'name' => 'required|string|max:255',
-            'quantity' => 'required|integer|min:0',
-            'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
-        ];
-    }
-
-    public function messages()
-    {
-        return [
-            'name.required' => 'Nama item wajib diisi.',
-            'quantity.integer' => 'Jumlah harus angka bulat.',
-            'price.numeric' => 'Harga harus berupa angka.',
-            'category_id.exists' => 'Kategori tidak ditemukan.',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'description' => 'nullable|string',
         ];
     }
 }

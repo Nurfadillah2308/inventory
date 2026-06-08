@@ -2,17 +2,23 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\CategoryController;
 
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+// Bungkus semua route dengan prefix v1
+Route::prefix('v1')->group(function () {
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->middleware('role:admin');
-    Route::delete('items/{item}', [ItemController::class, 'destroy'])->middleware('role:admin');
+    // Public Routes (Register & Login)
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
 
-    Route::apiResource('categories', CategoryController::class)->except(['destroy']);
-    Route::apiResource('items', ItemController::class)->except(['destroy']);
+    // Protected Routes (Harus menggunakan token)
+    Route::middleware('auth:sanctum')->group(function () {
+        
+        // Resource Route untuk Items dan Categories
+        Route::apiResource('items', ItemController::class);
+        Route::apiResource('categories', CategoryController::class);
+        
+    });
 });
