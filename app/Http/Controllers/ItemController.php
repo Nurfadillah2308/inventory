@@ -14,12 +14,15 @@ class ItemController extends BaseController
 {
     public function index(Request $request)
     {
+        // Memulai query dengan eager loading relasi category
         $query = Item::with('category');
 
+        // Jika terdapat parameter category_id di URL, lakukan filtering
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
         }
 
+        // Mengambil hasil data dan mengembalikannya dengan wrapper success
         return $this->success($query->get(), 'Items retrieved successfully.');
     }
 
