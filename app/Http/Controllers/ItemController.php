@@ -9,7 +9,7 @@ use App\Http\Requests\UpdateItemRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Exception;
-
+// hasil saran dari rekan tteman collab
 class ItemController extends BaseController
 {
     public function index(Request $request)
