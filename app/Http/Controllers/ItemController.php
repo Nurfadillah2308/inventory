@@ -7,14 +7,20 @@ use App\Models\Item;
 use App\Http\Requests\StoreItemRequest;
 use App\Http\Requests\UpdateItemRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
 use Exception;
 
 class ItemController extends BaseController
 {
-    public function index()
+    public function index(Request $request)
     {
-        $items = Item::with('category')->get();
-        return $this->success($items, 'Items retrieved successfully.');
+        $query = Item::with('category');
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        return $this->success($query->get(), 'Items retrieved successfully.');
     }
 
     public function store(StoreItemRequest $request)

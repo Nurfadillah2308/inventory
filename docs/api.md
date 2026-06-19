@@ -4,6 +4,9 @@
 Dokumentasi ini berisi daftar endpoint API untuk Modul Inventory (Versi 1), lengkap dengan spesifikasi request, sanitasi input, dan format response JSON yang konsisten menggunakan BaseController wrapper.
 
 ---
+### Filter Items by Category
+- Endpoint: `GET /api/v1/items?category_id={id}`
+- Description: Filter items by category, optional.
 
 ## Format Response Konsisten (BaseController Wrapper)
 
